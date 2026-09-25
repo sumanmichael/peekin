@@ -12,12 +12,6 @@ uvx peekin ~/Pictures --open   # share a folder and open the browser
 python -m peekin               # after: pip install peekin
 ```
 
-Until the first PyPI release:
-
-```bash
-uvx --from git+https://github.com/sumanmichael/peekin peekin
-```
-
 ## Share on your network
 
 ```bash
@@ -58,12 +52,6 @@ Set your own with `PEEKIN_PASSWORD=...` or `--password-file FILE`.
 uv run pytest
 uv run peekin .
 ```
-
-## Release
-
-1. Bump `__version__` in `src/peekin/__init__.py` and commit.
-2. `gh release create vX.Y.Z --generate-notes` (the tag must match the version).
-3. The `publish` workflow tests, builds, and uploads to PyPI via trusted publishing.
 
 ## License
 
