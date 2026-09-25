@@ -1,4 +1,9 @@
 import pytest
+from starlette.testclient import TestClient
+
+from peekin.app import create_app
+from peekin.auth import Auth
+from peekin.fs import Root
 
 
 @pytest.fixture
@@ -16,3 +21,13 @@ def tree(tmp_path):
     (tmp_path / "outside.txt").write_text("outside")
     (root / "escape").symlink_to(tmp_path / "outside.txt")
     return root
+
+
+@pytest.fixture
+def client(tree):
+    return TestClient(create_app(Root(tree), Auth(None)))
+
+
+@pytest.fixture
+def locked_client(tree):
+    return TestClient(create_app(Root(tree), Auth("s3cret")))
