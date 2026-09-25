@@ -1,8 +1,8 @@
 # peekin
 
 A lightweight, read-only file browser for your web browser. Browse a folder and
-preview images (swipeable gallery), video, audio, PDF, and source code with
-syntax highlighting. Works on desktop and phone. Fully offline.
+preview images (swipeable gallery), video, audio, PDF, rendered Markdown, and
+source code with syntax highlighting. Works on desktop and phone. Fully offline.
 
 ## Run
 
@@ -67,4 +67,5 @@ uv run peekin .
 
 ## License
 
-MIT
+MIT. Bundles [Lucide](https://lucide.dev) icons (ISC) and the Schibsted Grotesk
+font (SIL OFL 1.1); their licenses are in `LICENSES/`.

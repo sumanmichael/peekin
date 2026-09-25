@@ -153,3 +153,8 @@ def test_markdown_route(tree, client, locked_client):
     assert client.get("/api/markdown?path=sub").status_code == 400
     assert client.get("/api/markdown?path=../outside.txt").status_code == 404
     assert locked_client.get("/api/markdown?path=notes.md").status_code == 401
+
+
+def test_app_shell_revalidates_after_upgrade(client):
+    assert client.get("/").headers["cache-control"] == "no-cache"
+    assert client.get("/static/app.js").headers["cache-control"] == "no-cache"

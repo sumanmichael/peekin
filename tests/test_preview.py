@@ -32,7 +32,7 @@ def test_unknown_extension_escapes_as_text(tmp_path):
 def test_invalid_utf8_replaced(tmp_path):
     p = tmp_path / "x.txt"
     p.write_bytes(b"caf\xe9")
-    assert "�" in code_preview(p)["html"]
+    assert "\ufffd" in code_preview(p)["html"]
 
 
 def test_mid_size_file_skips_highlighting(tmp_path):

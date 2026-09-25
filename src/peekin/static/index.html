@@ -5,37 +5,52 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="color-scheme" content="light dark">
 <title>peekin</title>
+<link rel="preload" href="/static/fonts/schibsted-grotesk.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="stylesheet" href="/static/app.css">
 <link rel="stylesheet" href="/static/code.css">
 <script src="/static/app.js" defer></script>
 </head>
 <body>
-<header class="bar">
-  <nav id="crumbs" class="crumbs" aria-label="Breadcrumb"></nav>
+<header class="bar" id="bar">
+  <a class="brand" href="#/" aria-label="peekin home"><svg class="icon" aria-hidden="true"><use href="/static/icons.svg#eye"/></svg><span>peekin</span></a>
+  <nav id="crumbs" class="crumbs" aria-label="Folder path"></nav>
+  <label class="search">
+    <svg class="icon" aria-hidden="true"><use href="/static/icons.svg#search"/></svg>
+    <input id="filter" type="search" placeholder="Filter this folder" aria-label="Filter this folder">
+  </label>
   <div class="tools">
-    <input id="filter" type="search" placeholder="Filter" aria-label="Filter this folder">
-    <select id="sort" aria-label="Sort by">
-      <option value="name">Name</option>
-      <option value="date">Newest</option>
-      <option value="size">Largest</option>
-    </select>
-    <button id="view" type="button" aria-label="Switch between grid and list">Grid</button>
-    <form id="logout" method="post" action="/logout" hidden><button type="submit">Log out</button></form>
+    <button id="search-toggle" class="iconbtn" type="button" aria-label="Filter this folder" aria-expanded="false"><svg class="icon" aria-hidden="true"><use href="/static/icons.svg#search"/></svg></button>
+    <label class="sort">
+      <svg class="icon" aria-hidden="true"><use href="/static/icons.svg#arrow-up-down"/></svg>
+      <select id="sort" aria-label="Sort by">
+        <option value="name">Name</option>
+        <option value="date">Newest</option>
+        <option value="size">Largest</option>
+      </select>
+    </label>
+    <button id="view" class="iconbtn" type="button" aria-label="Show as grid"><svg class="icon" aria-hidden="true"><use href="/static/icons.svg#layout-grid"/></svg></button>
+    <form id="logout" method="post" action="/logout" hidden>
+      <button class="iconbtn" type="submit" aria-label="Log out" title="Log out"><svg class="icon" aria-hidden="true"><use href="/static/icons.svg#log-out"/></svg></button>
+    </form>
   </div>
 </header>
 <main id="list"></main>
 <div id="error" class="toast" role="alert" hidden></div>
 <section id="viewer" aria-label="Viewer" hidden>
   <div class="vbar">
-    <a id="v-close" class="btn" aria-label="Close">&times;</a>
+    <a id="v-close" class="btn iconbtn" aria-label="Close" title="Close"><svg class="icon" aria-hidden="true"><use href="/static/icons.svg#x"/></svg></a>
     <span id="v-name" class="vname"></span>
     <span id="v-count" class="vcount"></span>
-    <a id="v-open" class="btn" target="_blank" rel="noopener">Open</a>
-    <a id="v-download" class="btn">Download</a>
+    <span id="v-mode" class="vgroup" hidden>
+      <button id="v-rendered" class="iconbtn" type="button" aria-label="Rendered" title="Rendered" aria-pressed="true"><svg class="icon" aria-hidden="true"><use href="/static/icons.svg#book-open"/></svg></button>
+      <button id="v-source" class="iconbtn" type="button" aria-label="Source" title="Source" aria-pressed="false"><svg class="icon" aria-hidden="true"><use href="/static/icons.svg#code-xml"/></svg></button>
+    </span>
+    <a id="v-open" class="btn iconbtn" target="_blank" rel="noopener" aria-label="Open original" title="Open original"><svg class="icon" aria-hidden="true"><use href="/static/icons.svg#external-link"/></svg></a>
+    <a id="v-download" class="btn iconbtn" aria-label="Download" title="Download"><svg class="icon" aria-hidden="true"><use href="/static/icons.svg#download"/></svg></a>
   </div>
   <div id="stage" class="stage"></div>
-  <button id="v-prev" class="nav prev" type="button" aria-label="Previous">&lsaquo;</button>
-  <button id="v-next" class="nav next" type="button" aria-label="Next">&rsaquo;</button>
+  <button id="v-prev" class="nav prev" type="button" aria-label="Previous"><svg class="icon" aria-hidden="true"><use href="/static/icons.svg#chevron-left"/></svg></button>
+  <button id="v-next" class="nav next" type="button" aria-label="Next"><svg class="icon" aria-hidden="true"><use href="/static/icons.svg#chevron-right"/></svg></button>
 </section>
 </body>
 </html>

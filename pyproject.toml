@@ -4,7 +4,7 @@ dynamic = ["version"]
 description = "Lightweight read-only file browser and previewer in your web browser"
 readme = "README.md"
 license = "MIT"
-license-files = ["LICENSE"]
+license-files = ["LICENSE", "LICENSES/*"]
 requires-python = ">=3.10"
 authors = [{ name = "Suman Michael" }]
 keywords = ["file browser", "file viewer", "gallery", "pdf", "syntax highlighting"]

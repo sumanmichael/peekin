@@ -60,6 +60,7 @@ class Hardening:
         if cross_site and not navigation:
             return await Response("cross-site request blocked", 403)(scope, receive, send)
         is_raw = scope["path"] == "/raw"
+        is_shell = scope["path"] == "/" or scope["path"].startswith("/static/")
 
         async def send_with_headers(message):
             if message["type"] == "http.response.start":
@@ -67,6 +68,8 @@ class Hardening:
                 headers.setdefault("X-Content-Type-Options", "nosniff")
                 headers.setdefault("Referrer-Policy", "no-referrer")
                 headers.setdefault("Cross-Origin-Resource-Policy", "same-origin")
+                if is_shell:  # revalidate (cheap ETag check) so an upgraded peekin never runs stale JS
+                    headers.setdefault("Cache-Control", "no-cache")
                 if not is_raw:  # /raw sets its own policy (none for PDF)
                     headers.setdefault("Content-Security-Policy", APP_CSP)
             await send(message)

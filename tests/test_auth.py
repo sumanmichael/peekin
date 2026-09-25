@@ -62,8 +62,8 @@ def test_logout_drops_session():
 
 
 def test_non_ascii_password():
-    auth = Auth("päss")
-    assert auth.attempt("ip", "päss")
+    auth = Auth("p\u00e4ss")
+    assert auth.attempt("ip", "p\u00e4ss")
 
 
 def test_login_page_escapes_error():

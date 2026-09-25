@@ -78,7 +78,7 @@ def login_page(error: str | None = None) -> str:
 </head>
 <body>
 <form class="login" method="post" action="/login">
-<h1>peekin</h1>
+<h1 class="brand"><svg class="icon" aria-hidden="true"><use href="/static/icons.svg#lock-keyhole"/></svg>peekin</h1>
 {message}
 <input type="password" name="password" placeholder="Password" aria-label="Password" autocomplete="current-password" autofocus required>
 <button type="submit">Log in</button>
