@@ -33,3 +33,10 @@ def test_invalid_utf8_replaced(tmp_path):
     p = tmp_path / "x.txt"
     p.write_bytes(b"caf\xe9")
     assert "�" in code_preview(p)["html"]
+
+
+def test_mid_size_file_skips_highlighting(tmp_path):
+    p = tmp_path / "big.js"
+    p.write_text("var a = 1;\n" * 30_000)  # ~330 KB: highlighted HTML would be many MB
+    out = code_preview(p)
+    assert out["truncated"] is False and out["html"].startswith('<pre class="plain">')

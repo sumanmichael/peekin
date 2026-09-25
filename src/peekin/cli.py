@@ -105,8 +105,7 @@ def main(argv: list[str] | None = None) -> int:
         print(f"error: cannot listen on {args.host}:{args.port} ({reason})", file=sys.stderr)
         return 1
 
-    allowed = LOOPBACK if password is None and args.host in LOOPBACK else None
-    app = create_app(Root(folder, args.show_hidden), Auth(password), thumbs, allowed_hosts=allowed)
+    app = create_app(Root(folder, args.show_hidden), Auth(password), thumbs, check_host=password is None)
     links = urls(args.host, sock.getsockname()[1])
     print(f"peekin {__version__} serving {folder.resolve()}")
     for link in links:
@@ -118,5 +117,5 @@ def main(argv: list[str] | None = None) -> int:
     if args.open:
         webbrowser.open(links[0])
     sys.stdout.flush()  # banner must show even when stdout is a pipe (e.g. a log file)
-    uvicorn.Server(uvicorn.Config(app, log_level="warning")).run(sockets=[sock])
+    uvicorn.Server(uvicorn.Config(app, log_level="warning", proxy_headers=False)).run(sockets=[sock])
     return 0

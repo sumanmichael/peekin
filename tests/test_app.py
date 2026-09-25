@@ -108,12 +108,6 @@ def test_login_redirects_when_auth_disabled(client):
     assert client.get("/login", follow_redirects=False).status_code == 303
 
 
-def test_host_allow_list(tree):
-    app = create_app(Root(tree), Auth(None), allowed_hosts={"127.0.0.1", "localhost", "::1"})
-    c = TestClient(app, base_url="http://127.0.0.1:8000")
-    assert c.get("/api/list").status_code == 200
-    assert c.get("/api/list", headers={"Host": "evil.example"}).status_code == 400
-    assert c.get("/api/list", headers={"Host": "[::1]:8000"}).status_code == 200
 
 
 def test_hostname():
@@ -124,3 +118,30 @@ def test_hostname():
 
 def test_favicon_is_empty_not_404(client):
     assert client.get("/favicon.ico").status_code == 204
+
+
+def test_cross_origin_protection(client):
+    assert client.get("/raw?path=a.txt").headers["cross-origin-resource-policy"] == "same-origin"
+    cross = {"sec-fetch-site": "cross-site", "sec-fetch-mode": "no-cors"}
+    assert client.get("/raw?path=code.py", headers=cross).status_code == 403
+    nav = {"sec-fetch-site": "cross-site", "sec-fetch-mode": "navigate"}
+    assert client.get("/", headers=nav).status_code == 200  # following a link to peekin still works
+    assert client.post("/logout", headers=nav, follow_redirects=False).status_code == 403
+    assert client.get("/api/list", headers={"sec-fetch-site": "same-origin"}).status_code == 200
+
+
+def test_trusted_host_check(tree):
+    c = TestClient(create_app(Root(tree), Auth(None), check_host=True))
+    for host in ["127.0.0.1:8000", "localhost:8000", "[::1]:8000", "192.168.1.5:8000", "peekin.local:8000"]:
+        assert c.get("/api/list", headers={"Host": host}).status_code == 200, host
+    assert c.get("/api/list", headers={"Host": "evil.example"}).status_code == 400
+
+
+def test_unreadable_file_is_not_found(tree, client):
+    (tree / "a.txt").chmod(0)
+    try:
+        if os.geteuid() != 0:
+            assert client.get("/api/code?path=a.txt").status_code == 404
+            assert client.get("/raw?path=a.txt").status_code == 404
+    finally:
+        (tree / "a.txt").chmod(0o644)

@@ -48,6 +48,8 @@ Set your own with `PEEKIN_PASSWORD=...` or `--password-file FILE`.
 - Paths cannot escape the shared folder, including through symlinks.
 - Five wrong passwords lock that IP address out for 60 seconds, doubling each time.
 - HTML and SVG files are downloaded, never rendered, so files you share can't run scripts in peekin.
+- Other websites you visit can't read your files through peekin: cross-site requests are blocked, and
+  without a password peekin only answers to IP addresses, `localhost`, and `*.local` names.
 - No HTTPS: use it on networks you trust, not on the public internet.
 
 ## Develop

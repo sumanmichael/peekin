@@ -95,3 +95,25 @@ def test_banner_visible_through_pipe_while_running(tmp_path):
     proc.wait(timeout=10)
     assert lines and lines[0].startswith("peekin ")
     assert any(line.strip().startswith("password: ") for line in lines)
+
+
+@pytest.mark.parametrize("args,env,check_host", [
+    (["--host", "0.0.0.0", "--no-password"], {}, True),
+    ([], {}, True),
+    (["--host", "0.0.0.0"], {"PEEKIN_PASSWORD": "pw"}, False),
+])
+def test_server_wiring(tmp_path, monkeypatch, args, env, check_host):
+    import uvicorn
+
+    import peekin.cli as cli
+
+    seen = {}
+    real_create_app = cli.create_app
+    monkeypatch.setattr(cli, "create_app", lambda *a, **kw: seen.update(kw) or real_create_app(*a, **kw))
+    monkeypatch.setattr(uvicorn.Server, "run", lambda self, sockets=None: seen.update(config=self.config))
+    monkeypatch.delenv("PEEKIN_PASSWORD", raising=False)
+    for k, v in env.items():
+        monkeypatch.setenv(k, v)
+    assert main([str(tmp_path), "--port", "0", *args]) == 0
+    assert seen["check_host"] is check_host
+    assert seen["config"].proxy_headers is False  # X-Forwarded-For must not fake the client IP

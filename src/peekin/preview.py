@@ -9,6 +9,7 @@ from pygments.lexers import TextLexer, get_lexer_for_filename
 from pygments.util import ClassNotFound
 
 MAX_BYTES = 1_000_000
+HIGHLIGHT_BYTES = 200_000  # highlighted HTML is ~15x the source; bigger files stay plain
 SNIFF_BYTES = 8192
 
 
@@ -18,8 +19,8 @@ def code_preview(path: Path) -> dict:
     if b"\x00" in data[:SNIFF_BYTES]:
         return {"binary": True, "truncated": False, "html": ""}
     text = data[:MAX_BYTES].decode("utf-8", errors="replace")
-    if len(data) > MAX_BYTES:
-        return {"binary": False, "truncated": True, "html": f'<pre class="plain">{html.escape(text)}</pre>'}
+    if len(data) > HIGHLIGHT_BYTES:
+        return {"binary": False, "truncated": len(data) > MAX_BYTES, "html": f'<pre class="plain">{html.escape(text)}</pre>'}
     try:
         lexer = get_lexer_for_filename(path.name, stripnl=False)
     except ClassNotFound:

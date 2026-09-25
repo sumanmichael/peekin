@@ -1,5 +1,6 @@
 """Starlette app: routes, login guard, and security headers."""
 
+import ipaddress
 import math
 from pathlib import Path
 from urllib.parse import parse_qs
@@ -28,20 +29,36 @@ def hostname(host: str) -> str:
     return host.rsplit(":", 1)[0] if host.count(":") == 1 else host
 
 
-class Hardening:
-    """Adds security headers to every response and optionally enforces a Host allow-list."""
+def trusted_host(host: str) -> bool:
+    """DNS rebinding needs a public DNS name; IP literals, localhost, and mDNS names are safe."""
+    name = hostname(host)
+    if name == "localhost" or name.endswith(".local"):
+        return True
+    try:
+        ipaddress.ip_address(name)
+        return True
+    except ValueError:
+        return False
 
-    def __init__(self, app, allowed_hosts: set[str] | None = None):
+
+class Hardening:
+    """Security headers, cross-site request blocking, and an optional Host check."""
+
+    def __init__(self, app, check_host: bool = False):
         self.app = app
-        self.allowed_hosts = allowed_hosts
+        self.check_host = check_host
 
     async def __call__(self, scope, receive, send):
         if scope["type"] != "http":
             return await self.app(scope, receive, send)
-        if self.allowed_hosts is not None:
-            host = dict(scope["headers"]).get(b"host", b"").decode("latin-1")
-            if hostname(host) not in self.allowed_hosts:
-                return await Response("invalid host", 400)(scope, receive, send)
+        headers = dict(scope["headers"])
+        if self.check_host and not trusted_host(headers.get(b"host", b"").decode("latin-1")):
+            return await Response("invalid host", 400)(scope, receive, send)
+        # Other websites may link to peekin (GET navigation) but not embed, fetch, or POST to it.
+        cross_site = headers.get(b"sec-fetch-site") == b"cross-site"
+        navigation = headers.get(b"sec-fetch-mode") == b"navigate" and scope["method"] == "GET"
+        if cross_site and not navigation:
+            return await Response("cross-site request blocked", 403)(scope, receive, send)
         is_raw = scope["path"] == "/raw"
 
         async def send_with_headers(message):
@@ -49,6 +66,7 @@ class Hardening:
                 headers = MutableHeaders(scope=message)
                 headers.setdefault("X-Content-Type-Options", "nosniff")
                 headers.setdefault("Referrer-Policy", "no-referrer")
+                headers.setdefault("Cross-Origin-Resource-Policy", "same-origin")
                 if not is_raw:  # /raw sets its own policy (none for PDF)
                     headers.setdefault("Content-Security-Policy", APP_CSP)
             await send(message)
@@ -56,7 +74,7 @@ class Hardening:
         await self.app(scope, receive, send_with_headers)
 
 
-def create_app(root: Root, auth: Auth, thumbs=None, allowed_hosts: set[str] | None = None) -> Starlette:
+def create_app(root: Root, auth: Auth, thumbs=None, check_host: bool = False) -> Starlette:
     def logged_in(request) -> bool:
         return auth.check(request.cookies.get(COOKIE))
 
@@ -71,6 +89,10 @@ def create_app(root: Root, auth: Auth, thumbs=None, allowed_hosts: set[str] | No
             raise HTTPException(404, "not found") from None
         if not path.is_file():  # directories, FIFOs, devices
             raise HTTPException(400, "not a regular file")
+        try:
+            path.open("rb").close()
+        except OSError:  # unreadable: answer like a missing file instead of a 500 or an empty body
+            raise HTTPException(404, "not found") from None
         return path
 
     def index(request):
@@ -161,5 +183,5 @@ def create_app(root: Root, auth: Auth, thumbs=None, allowed_hosts: set[str] | No
         ],
         exception_handlers={HTTPException: http_error},
     )
-    app.add_middleware(Hardening, allowed_hosts=allowed_hosts)
+    app.add_middleware(Hardening, check_host=check_host)
     return app
