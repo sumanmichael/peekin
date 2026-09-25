@@ -59,6 +59,12 @@ uv run pytest
 uv run peekin .
 ```
 
+## Release
+
+1. Bump `__version__` in `src/peekin/__init__.py` and commit.
+2. `gh release create vX.Y.Z --generate-notes` (the tag must match the version).
+3. The `publish` workflow tests, builds, and uploads to PyPI via trusted publishing.
+
 ## License
 
 MIT
