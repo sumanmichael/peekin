@@ -67,6 +67,7 @@ def test_unreadable_dir_is_not_found(tree):
     ("x.jpg", "image"), ("x.PNG", "image"), ("x.svg", "image"), ("x.webp", "image"),
     ("x.mp4", "video"), ("x.webm", "video"), ("x.mp3", "audio"), ("x.pdf", "pdf"),
     ("x.py", "code"), ("x.ts", "code"), ("Dockerfile", "code"), ("x.txt", "text"), ("x.bin", "other"),
+    ("README.md", "markdown"), ("x.MARKDOWN", "markdown"),
 ])
 def test_kind_of(name, kind):
     assert kind_of(name) == kind

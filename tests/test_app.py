@@ -145,3 +145,11 @@ def test_unreadable_file_is_not_found(tree, client):
             assert client.get("/raw?path=a.txt").status_code == 404
     finally:
         (tree / "a.txt").chmod(0o644)
+
+
+def test_markdown_route(tree, client, locked_client):
+    (tree / "notes.md").write_text("# Hi\n")
+    assert client.get("/api/markdown?path=notes.md").json()["html"].startswith("<h1>Hi</h1>")
+    assert client.get("/api/markdown?path=sub").status_code == 400
+    assert client.get("/api/markdown?path=../outside.txt").status_code == 404
+    assert locked_client.get("/api/markdown?path=notes.md").status_code == 401

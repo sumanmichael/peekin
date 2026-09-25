@@ -32,6 +32,8 @@ def kind_of(name: str) -> str:
     if mime.startswith("image/"):
         return "image"
     suffix = Path(name).suffix.lower()
+    if suffix in (".md", ".markdown"):
+        return "markdown"
     # ponytail: keyed by suffix so big folders stay fast; misses name-only lexers like CMakeLists.txt
     if _has_code_lexer("f" + suffix if suffix else name):
         return "code"

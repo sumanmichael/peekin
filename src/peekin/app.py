@@ -14,7 +14,7 @@ from starlette.staticfiles import StaticFiles
 
 from .auth import COOKIE, SESSION_TTL, Auth, login_page
 from .fs import NotFound, Root
-from .preview import code_preview
+from .preview import code_preview, markdown_preview
 
 STATIC = Path(__file__).parent / "static"
 APP_CSP = "default-src 'self'; img-src 'self' blob:; media-src 'self'; frame-src 'self'; object-src 'self'"
@@ -145,6 +145,10 @@ def create_app(root: Root, auth: Auth, thumbs=None, check_host: bool = False) ->
         require(request)
         return JSONResponse(code_preview(resolve_file(request)))
 
+    def api_markdown(request):
+        require(request)
+        return JSONResponse(markdown_preview(resolve_file(request)))
+
     def raw(request):
         require(request)
         path = resolve_file(request)
@@ -177,6 +181,7 @@ def create_app(root: Root, auth: Auth, thumbs=None, check_host: bool = False) ->
             Route("/logout", logout, methods=["POST"]),
             Route("/api/list", api_list),
             Route("/api/code", api_code),
+            Route("/api/markdown", api_markdown),
             Route("/raw", raw),
             Route("/thumb", thumb),
             Mount("/static", StaticFiles(directory=STATIC)),
