@@ -155,9 +155,10 @@ button:hover, .btn:hover, select:hover { border-color: var(--graphite); }
 .vgroup { display: inline-flex; gap: 4px; }
 .stage { position: relative; flex: 1; min-height: 0; padding: 0 12px 12px; display: flex; align-items: center; justify-content: center; overflow: hidden; touch-action: pan-y; }
 .media { max-width: 100%; max-height: 100%; object-fit: contain; user-select: none; -webkit-user-drag: none; }
-img.media { touch-action: none; animation: develop .18s ease-out; }
+img.media { touch-action: none; }
+img.media.develop { animation: develop .18s ease-out; }
 @keyframes develop { from { opacity: 0; transform: scale(.98); } }
-@media (prefers-reduced-motion: reduce) { img.media { animation: none; } .mount { transition: none; } }
+@media (prefers-reduced-motion: reduce) { img.media.develop { animation: none; } .mount { transition: none; } }
 .pdf { width: 100%; height: 100%; border: 0; background: #fff; }
 .nav {
   position: absolute; top: 50%; transform: translateY(-50%); width: 44px; height: 64px; padding: 0; justify-content: center;

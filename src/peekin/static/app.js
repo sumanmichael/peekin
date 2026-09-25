@@ -153,9 +153,10 @@ function openViewer(path) {
   const seq = visible().filter((e) => e.kind === "image" || e.kind === "video");
   state.seq = seq.some((e) => e.path === path) ? seq : [entry];
   state.index = state.seq.findIndex((e) => e.path === path);
+  const opening = $("#viewer").hidden;
   $("#viewer").hidden = false;
   document.body.classList.add("viewing");
-  renderViewer();
+  renderViewer(opening);
 }
 
 function closeViewer() {
@@ -170,7 +171,8 @@ function go(delta) {
   if (next) location.replace(href(next.path, true));  // replace: Back returns to the folder
 }
 
-function renderViewer() {
+// `opening` plays the fade-in once; swiping between photos must swap instantly, not blink.
+function renderViewer(opening = false) {
   const e = state.seq[state.index];
   const raw = rawUrl(e.path);
   $("#v-name").textContent = e.name;
@@ -183,7 +185,7 @@ function renderViewer() {
   $("#v-mode").hidden = e.kind !== "markdown";
   $("#v-rendered").setAttribute("aria-pressed", String(state.mdMode === "rendered"));
   $("#v-source").setAttribute("aria-pressed", String(state.mdMode === "source"));
-  $("#stage").replaceChildren(content(e, raw));
+  $("#stage").replaceChildren(content(e, raw, opening));
   for (const d of [-1, 1]) {
     const n = state.seq[state.index + d];
     if (n && n.kind === "image") new Image().src = rawUrl(n.path);
@@ -244,10 +246,10 @@ function markdownView(e) {
   return box;
 }
 
-function content(e, raw) {
+function content(e, raw, opening) {
   switch (e.kind) {
     case "image":
-      return h("img", { class: "media", src: raw, alt: e.name, draggable: "false" });
+      return h("img", { class: opening ? "media develop" : "media", src: raw, alt: e.name, draggable: "false" });
     case "video":
     case "audio": {
       const media = h(e.kind, { class: "media", src: raw, controls: true, preload: "metadata", playsinline: true });
