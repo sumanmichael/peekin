@@ -120,3 +120,7 @@ def test_hostname():
     assert hostname("127.0.0.1:8000") == "127.0.0.1"
     assert hostname("[::1]:8000") == "::1"
     assert hostname("localhost") == "localhost"
+
+
+def test_favicon_is_empty_not_404(client):
+    assert client.get("/favicon.ico").status_code == 204

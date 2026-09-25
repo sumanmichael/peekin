@@ -1,2 +1,41 @@
 <!doctype html>
-<html lang="en"><head><meta charset="utf-8"><title>peekin</title></head><body></body></html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="color-scheme" content="light dark">
+<title>peekin</title>
+<link rel="stylesheet" href="/static/app.css">
+<link rel="stylesheet" href="/static/code.css">
+<script src="/static/app.js" defer></script>
+</head>
+<body>
+<header class="bar">
+  <nav id="crumbs" class="crumbs" aria-label="Breadcrumb"></nav>
+  <div class="tools">
+    <input id="filter" type="search" placeholder="Filter" aria-label="Filter this folder">
+    <select id="sort" aria-label="Sort by">
+      <option value="name">Name</option>
+      <option value="date">Newest</option>
+      <option value="size">Largest</option>
+    </select>
+    <button id="view" type="button" aria-label="Switch between grid and list">Grid</button>
+    <form id="logout" method="post" action="/logout" hidden><button type="submit">Log out</button></form>
+  </div>
+</header>
+<main id="list"></main>
+<div id="error" class="toast" role="alert" hidden></div>
+<section id="viewer" aria-label="Viewer" hidden>
+  <div class="vbar">
+    <a id="v-close" class="btn" aria-label="Close">&times;</a>
+    <span id="v-name" class="vname"></span>
+    <span id="v-count" class="vcount"></span>
+    <a id="v-open" class="btn" target="_blank" rel="noopener">Open</a>
+    <a id="v-download" class="btn">Download</a>
+  </div>
+  <div id="stage" class="stage"></div>
+  <button id="v-prev" class="nav prev" type="button" aria-label="Previous">&lsaquo;</button>
+  <button id="v-next" class="nav next" type="button" aria-label="Next">&rsaquo;</button>
+</section>
+</body>
+</html>

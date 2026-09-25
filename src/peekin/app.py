@@ -149,6 +149,7 @@ def create_app(root: Root, auth: Auth, thumbs=None, allowed_hosts: set[str] | No
     app = Starlette(
         routes=[
             Route("/", index),
+            Route("/favicon.ico", lambda request: Response(status_code=204)),  # no icon; avoids a console 404
             Route("/login", login_get, methods=["GET"]),
             Route("/login", login_post, methods=["POST"]),
             Route("/logout", logout, methods=["POST"]),
